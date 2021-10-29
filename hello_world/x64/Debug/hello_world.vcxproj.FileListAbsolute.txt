@@ -1,0 +1,2 @@
+F:\repos\OpenGl\hello_world\x64\Debug\hello_world.exe
+F:\repos\OpenGl\hello_world\x64\Debug\hello_world.pdb
