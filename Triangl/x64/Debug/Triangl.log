@@ -1,0 +1,3 @@
+﻿  Triangl.cpp
+F:\repos\OpenGl\Triangl\Triangl.cpp(227,25): warning C4244: инициализация: преобразование "double" в "float", возможна потеря данных
+  Triangl.vcxproj -> F:\repos\OpenGl\hello_world\x64\Debug\Triangl.exe
