@@ -1,3 +1,12 @@
+<<<<<<< HEAD
+*
+!.gitignore
+
+/OpenGl/
+    .gitignore
+    /GL
+=======
 # Default ignored files
 
 /GL/
+>>>>>>> 1ca68f836e54a7ba1653e7d87af6c5a6b0ccee38
