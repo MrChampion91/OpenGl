@@ -1,0 +1,3 @@
+﻿  ShaderProgram.cpp
+F:\repos\OpenGl\ShaderProgram\ShaderProgram.cpp(220,25): warning C4244: инициализация: преобразование "double" в "float", возможна потеря данных
+  ShaderProgram.vcxproj -> F:\repos\OpenGl\hello_world\x64\Debug\ShaderProgram.exe

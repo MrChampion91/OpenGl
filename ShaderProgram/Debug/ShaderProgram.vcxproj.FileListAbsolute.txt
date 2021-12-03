@@ -1,0 +1,2 @@
+F:\repos\OpenGl\ShaderProgram\Debug\ShaderProgram.exe
+F:\repos\OpenGl\ShaderProgram\Debug\ShaderProgram.pdb
