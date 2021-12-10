@@ -5,6 +5,10 @@
 
 #include "stb_image.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void checkCompileErrors(unsigned int shader, std::string type);
@@ -21,10 +25,12 @@ const char* vertexShaderSource = "#version 330 core\n"
 
 "out vec3 ourColor;\n"
 "out vec2 TexCoord;\n"
+"uniform mat4 transform;\n"
+
 
 "void main()\n"
 "{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"   gl_Position = transform * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
 "   ourColor = acolor;\n"
 "   TexCoord = vec2(aTexCoord.x, aTexCoord.y);\n"
 "}\0";
@@ -32,10 +38,11 @@ const char* vertexShaderSource = "#version 330 core\n"
 const char* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
 "uniform float time;\n"
+"in vec3 ourColor;\n"
 
 "void main()\n"
 "{\n"
-"   FragColor = vec4(vec3(sin(time), 0.5f, 0.5f ), 1.0f);\n"
+"   FragColor = vec4(vec3(sin(time), 0.5f, 0.5f ), 1.0f) ;\n"
 "}\n\0";
 
 //add fragment shader for second triangle
@@ -48,8 +55,10 @@ const char* fragmentShaderSource2 = "#version 330 core\n"
 
 "void main()\n"
 "{\n"
-"   FragColor = texture(ourTexture, TexCoord);\n"
+"   FragColor = texture(ourTexture, TexCoord) * vec4(ourColor, 1.0);\n"
 "}\n\0";
+
+//FragColor = texture(ourTexture, TexCoord) * vec4(ourColor, 1.0);
 
 
 int main()
@@ -214,16 +223,38 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
         // textures
         glBindTexture(GL_TEXTURE_2D, texture);
+
+
+        // Создаем преобразование
+        glm::mat4 transform = glm::mat4(1.0f); // сначала инициализируем единичную матрицу
+        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        transform = glm::translate(transform, glm::vec3(0.0f, -0.5f, 0.0f));
+
+        // Получаем location uniform-переменной матрицы и настраиваем её
+        unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+
         // Рисуем наш первый треугольник
         glUseProgram(shaderProgram);
 
         float timeValue = glfwGetTime();
         glUniform1f(timeuniform, timeValue);
 
-
+      
         glBindVertexArray(VAO1); // поскольку у нас есть только один VAO, то нет необходимости связывать его каждый раз (но мы сделаем это, чтобы всё было немного организованнее)
         glDrawArrays(GL_TRIANGLES, 0, 3);
         // glBindVertexArray(0); // не нужно каждый раз его отвязывать
+
+
+                // Создаем преобразование
+        glm::mat4 transform2 = glm::mat4(1.0f); // сначала инициализируем единичную матрицу
+        transform2 = glm::translate(transform, glm::vec3(0.0f, 0.5f, 0.0f));
+        transform2 = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        
+                // Получаем location uniform-переменной матрицы и настраиваем её
+        unsigned int transformLoc2 = glGetUniformLocation(shaderProgram2, "transform");
+        glUniformMatrix4fv(transformLoc2, 1, GL_FALSE, glm::value_ptr(transform2));
+
         // add and draw second triangle
         glUseProgram(shaderProgram2);
 
