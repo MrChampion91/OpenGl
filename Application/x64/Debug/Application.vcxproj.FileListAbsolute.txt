@@ -1,0 +1,2 @@
+F:\repos\OpenGl\Application\x64\Debug\Application.exe
+F:\repos\OpenGl\Application\x64\Debug\Application.pdb
