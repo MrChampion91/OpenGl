@@ -13,11 +13,31 @@
 #include "stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window, GLuint program);
+void processInput(GLFWwindow* window);
 bool loadShaders(GLuint& program);
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 const int WINDOW_WIDTH = 640;
 const int WINDOW_HEIGH = 480;
+
+// camera parameters
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+// mouse control parameters
+bool firstMouse = true;
+float yaw = -90.0f;	// fix rotation
+float pitch = 0.0f;
+float lastX = 800.0f / 2.0;
+float lastY = 600.0 / 2.0;
+float fov = 45.0f;
+
+// time
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
 // Vertices coordinates
 GLfloat vertices[] = 
@@ -95,6 +115,12 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    //mouse control function
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+
+    // Сообщаем GLFW, чтобы он захватил наш курсор 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // glew init
     glewExperimental = GL_TRUE;
@@ -171,10 +197,10 @@ int main(void)
     stbi_set_flip_vertically_on_load(true);
     // load image. create texture . generate mippam
     int width, height, nrChannels;
-    unsigned char* data = stbi_load("textures/wood25_512.jpg", &width, &height, &nrChannels, 0);
+    unsigned char* data = stbi_load("textures/awesomeface.png", &width, &height, &nrChannels, 0);
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
@@ -183,50 +209,56 @@ int main(void)
     }
     stbi_image_free(data);
 
-    //camera prozection
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    //active shader before sanding parameters
+    glUseProgram(core_program);
+
     //camera perspective
-    glm::mat4 projection;
-    projection = glm::perspective(glm::radians(65.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(65.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+    //send perspective parameters to shader
+    int projectLoc = glGetUniformLocation(core_program, "projection");
+    glUniformMatrix4fv(projectLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
     //backface fix
     glEnable(GL_DEPTH_TEST);
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
+
+        //update time parameters
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         glClearColor(0.1f, 0.3f, 0.4f, 1.0f);
 
-        //binde textures
-        glBindTexture(GL_TEXTURE_2D, texture);
 
-        //matrix transform
-        glm::mat4 transform = glm::mat4(1.0f); // entity matrix
-        //transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
-        transform = glm::rotate(transform, (float)glfwGetTime()*2, glm::vec3(0.0f, 1.0f, 1.0f));
+        // transformation my model
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+        int modelLoc = glGetUniformLocation(core_program, "model");
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        
 
-
-        // use program
-        glUseProgram(core_program);
-
+        // momving camera
+        glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         //update uniform
         int viewLoc = glGetUniformLocation(core_program, "view");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
-        int projectLoc = glGetUniformLocation(core_program, "projection");
-        glUniformMatrix4fv(projectLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-        unsigned int transLoc = glGetUniformLocation(core_program, "transform");
-        glUniformMatrix4fv(transLoc, 1, GL_FALSE, glm::value_ptr(transform));
 
+        //binde textures
+        glBindTexture(GL_TEXTURE_2D, texture);
+        // use program
+        glUseProgram(core_program);
         //binde and draw mesh
         glBindVertexArray(VAO);
         // Draw primitives, number of indices, datatype of indices, index of indices
         //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         /* Swap front and back buffers */
@@ -234,7 +266,7 @@ int main(void)
 
         /* Poll for and process events */
         glfwPollEvents();
-        processInput(window, core_program);//escape and arrow
+        processInput(window);//escape and arrow
     }
 
 
@@ -249,35 +281,23 @@ int main(void)
 }
 
 
-void processInput(GLFWwindow* window, GLuint program)
+void processInput(GLFWwindow* window)
 {
-    int vertexColorLocation2 = glGetUniformLocation(program, "yOffset");
-    int vertexColorLocation = glGetUniformLocation(program, "xOffset");
-
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+
+    float cameraSpeed = 2.5 * deltaTime;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        glClearColor(0.1f, 0.7f, 0.3f, 1.0f);
-        //glUniform1f(vertexColorLocation2, -0.5f);
+        cameraPos += cameraSpeed * cameraFront;
 
     }
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-    {
-        glClearColor(0.7f, 0.2f, 0.8f, 1.0f);
-        //glUniform1f(vertexColorLocation2, 0.5f);
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-    {
-        glClearColor(0.0f, 0.2f, 0.3f, 1.0f);
-        //glUniform1f(vertexColorLocation, -0.5f);
-    }
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-    {
-        glClearColor(1.f, 0.0f, 0.0f, 1.0f);
-        //glUniform1f(vertexColorLocation, 0.5f);
-    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        cameraPos -= cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
 
 // glfw: change windows size
@@ -388,4 +408,48 @@ bool loadShaders(GLuint &program)
 
 }
 
+//  glfw: всякий раз, когда перемещается мышь, вызывается данная callback-функция
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
 
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // перевернуто, так как y-координаты идут снизу вверх
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.1f; // измените это значение по своему усмотрению
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    // Убеждаемся, что когда значение тангаж выходит за пределы, экран не переворачивается
+    if (pitch > 89.0f)
+        pitch = 89.0f;
+    if (pitch < -89.0f)
+        pitch = -89.0f;
+
+    glm::vec3 front;
+    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front.y = sin(glm::radians(pitch));
+    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(front);
+}
+
+// glfw: всякий раз, когда прокручивается колесико мыши, вызывается данная callback-функция
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    if (fov >= 1.0f && fov <= 45.0f)
+        fov -= yoffset;
+    if (fov <= 1.0f)
+        fov = 1.0f;
+    if (fov >= 45.0f)
+        fov = 45.0f;
+}
