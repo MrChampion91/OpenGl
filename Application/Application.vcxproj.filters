@@ -20,7 +20,17 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="VertexShader.glsl" />
-    <None Include="FragmentShader.glsl" />
+    <None Include="base.fs" />
+    <None Include="base.vs" />
+    <None Include="light.vs" />
+    <None Include="light.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

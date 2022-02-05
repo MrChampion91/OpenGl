@@ -1,11 +1,11 @@
 ﻿  Application.cpp
-F:\repos\OpenGl\Application\Application.cpp(229,28): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-F:\repos\OpenGl\Application\Application.cpp(289,23): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-F:\repos\OpenGl\Application\Application.cpp(416,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-F:\repos\OpenGl\Application\Application.cpp(417,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-F:\repos\OpenGl\Application\Application.cpp(421,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-F:\repos\OpenGl\Application\Application.cpp(422,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-F:\repos\OpenGl\Application\Application.cpp(423,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-F:\repos\OpenGl\Application\Application.cpp(424,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-F:\repos\OpenGl\Application\Application.cpp(450,23): warning C4244: '-=': conversion from 'double' to 'float', possible loss of data
+F:\repos\OpenGl\Application\Shader.h(61,40): warning C4101: 'e': unreferenced local variable
+F:\repos\OpenGl\Application\Application.cpp(237,28): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+F:\repos\OpenGl\Application\Application.cpp(341,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+F:\repos\OpenGl\Application\Application.cpp(342,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+F:\repos\OpenGl\Application\Application.cpp(346,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+F:\repos\OpenGl\Application\Application.cpp(347,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+F:\repos\OpenGl\Application\Application.cpp(349,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+F:\repos\OpenGl\Application\Application.cpp(350,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+F:\repos\OpenGl\Application\Application.cpp(358,31): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
   Application.vcxproj -> F:\repos\OpenGl\Application\Debug\Application.exe
