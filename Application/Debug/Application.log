@@ -1,11 +1,16 @@
 ﻿  Application.cpp
 F:\repos\OpenGl\Application\Shader.h(61,40): warning C4101: 'e': unreferenced local variable
-F:\repos\OpenGl\Application\Application.cpp(237,28): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-F:\repos\OpenGl\Application\Application.cpp(341,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-F:\repos\OpenGl\Application\Application.cpp(342,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-F:\repos\OpenGl\Application\Application.cpp(346,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-F:\repos\OpenGl\Application\Application.cpp(347,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-F:\repos\OpenGl\Application\Application.cpp(349,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-F:\repos\OpenGl\Application\Application.cpp(350,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-F:\repos\OpenGl\Application\Application.cpp(358,31): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+F:\repos\OpenGl\Application\Application.cpp(236,28): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+F:\repos\OpenGl\Application\Application.cpp(343,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+F:\repos\OpenGl\Application\Application.cpp(344,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+F:\repos\OpenGl\Application\Application.cpp(348,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+F:\repos\OpenGl\Application\Application.cpp(349,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+F:\repos\OpenGl\Application\Application.cpp(351,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+F:\repos\OpenGl\Application\Application.cpp(352,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+F:\repos\OpenGl\Application\Application.cpp(360,31): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+soil2-debug.lib(SOIL2.obj) : warning LNK4099: PDB 'soil2-static-lib.pdb' was not found with 'soil2-debug.lib(SOIL2.obj)' or at 'F:\repos\OpenGl\Application\Debug\soil2-static-lib.pdb'; linking object as if no debug info
+soil2-debug.lib(image_DXT.obj) : warning LNK4099: PDB '' was not found with 'soil2-debug.lib(image_DXT.obj)' or at ''; linking object as if no debug info
+soil2-debug.lib(image_helper.obj) : warning LNK4099: PDB 'soil2-static-lib.pdb' was not found with 'soil2-debug.lib(image_helper.obj)' or at 'F:\repos\OpenGl\Application\Debug\soil2-static-lib.pdb'; linking object as if no debug info
+soil2-debug.lib(wfETC.obj) : warning LNK4099: PDB 'soil2-static-lib.pdb' was not found with 'soil2-debug.lib(wfETC.obj)' or at 'F:\repos\OpenGl\Application\Debug\soil2-static-lib.pdb'; linking object as if no debug info
   Application.vcxproj -> F:\repos\OpenGl\Application\Debug\Application.exe

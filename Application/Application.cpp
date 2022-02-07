@@ -224,7 +224,6 @@ int main(void)
     //active shader before sanding parameters
     base_shader.use();
 
-    base_shader.setVec3("lightPos", lightPos);// tell shader position of light object
 
     //backface fix
     glEnable(GL_DEPTH_TEST);
@@ -263,6 +262,9 @@ int main(void)
         // momving camera
         glm::mat4 view = camera.GetViewMatrix();
         base_shader.setMat4("view", view);
+
+        // camera position for refraction
+        base_shader.setVec3("viewPos", camera.Position);
 
 
         //binde textures
