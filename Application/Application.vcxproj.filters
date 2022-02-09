@@ -24,6 +24,7 @@
     <None Include="base.vs" />
     <None Include="light.vs" />
     <None Include="light.fs" />
+    <None Include="base2.fs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">

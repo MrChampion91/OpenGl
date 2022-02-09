@@ -156,6 +156,7 @@
   <ItemGroup>
     <None Include="base.fs" />
     <None Include="base.vs" />
+    <None Include="base2.fs" />
     <None Include="light.fs" />
     <None Include="light.vs" />
   </ItemGroup>

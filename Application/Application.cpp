@@ -19,6 +19,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+unsigned int loadTexture(char const* path);
 
 const int WINDOW_WIDTH = 640;
 const int WINDOW_HEIGH = 480;
@@ -130,7 +131,7 @@ int main(void)
     }
 
     //Shader init
-    Shader base_shader("base.vs", "base.fs");
+    Shader base_shader("base.vs", "base2.fs");
 
     Shader lamp_shader("light.vs", "light.fs");
 
@@ -192,38 +193,14 @@ int main(void)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-
     // gen and binde textures
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture); 
-
-    // mapping projection
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // filter textufes
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    //flip image before loading
-    stbi_set_flip_vertically_on_load(true);
-    // load image. create texture . generate mippam
-    int width, height, nrChannels;
-    unsigned char* data = stbi_load("textures/wood25_512.jpg", &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-
+    unsigned int diffuseMap = loadTexture("textures/wood25_512.jpg");
+    unsigned int specularMap = loadTexture("textures/Tiles_Decorative_10_metallic.jpg");
+    
     //active shader before sanding parameters
     base_shader.use();
-
+    base_shader.setInt("material.diffuse", 0);
+    base_shader.setInt("material.specular", 1);
 
     //backface fix
     glEnable(GL_DEPTH_TEST);
@@ -244,9 +221,32 @@ int main(void)
 
         // use base shader and send 
         base_shader.use();
+        base_shader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+        base_shader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+        base_shader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        base_shader.setFloat("material.shininess", 32.0f);
+
+        //base_shader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+        //base_shader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+        base_shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        
         base_shader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
         base_shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         base_shader.setVec3("lightPos", lightPos);
+
+        glm::vec3 lightColor;
+        lightColor.x = sin(glfwGetTime() * 0.1f);
+        lightColor.y = sin(glfwGetTime() * 0.7f);
+        lightColor.z = sin(glfwGetTime() * 1.3f);
+
+        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.4f);
+
+        base_shader.setVec3("light.ambient", ambientColor);
+        base_shader.setVec3("light.diffuse", diffuseColor);
+
+
+
 
 
         //camera perspective
@@ -256,7 +256,7 @@ int main(void)
 
         // transformation my model
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(30.0f), glm::vec3(0.6f, 0.3f, 0.5f));
         base_shader.setMat4("model", model);
 
         // momving camera
@@ -268,7 +268,11 @@ int main(void)
 
 
         //binde textures
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, diffuseMap);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specularMap);
 
 
 
@@ -279,13 +283,13 @@ int main(void)
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
-        // Также отрисовываем наш объект-"лампочку" 
+        // draw a lamp object
         lamp_shader.use();
         lamp_shader.setMat4("projection", projection);
         lamp_shader.setMat4("view", view);
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f)); // куб меньшего размера
+        model = glm::scale(model, glm::vec3(0.2f)); // set cube smaller
         lamp_shader.setMat4("model", model);
 
         glBindVertexArray(lightVAO);
@@ -358,4 +362,41 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(yoffset);
+}
+
+unsigned int loadTexture(char const* path)
+{
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+
+    int width, height, nrComponents;
+    unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
+    if (data)
+    {
+        GLenum format;
+        if (nrComponents == 1)
+            format = GL_RED;
+        else if (nrComponents == 3)
+            format = GL_RGB;
+        else if (nrComponents == 4)
+            format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+        stbi_image_free(data);
+    }
+
+    return textureID;
 }

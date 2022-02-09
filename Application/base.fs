@@ -7,6 +7,7 @@ in vec2 TexCoord;
 in vec3 Normal;
 in vec3 FragPos;
 
+
 uniform sampler2D texture1;
 uniform vec3 viewPos;//viev position for reflection
 
@@ -27,7 +28,7 @@ void main()
     vec3 diffuse = diff * lightColor;
 
     // reflection
-    float specularStrength = 0.9;
+    float specularStrength = 0.5;
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, norm);  
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
